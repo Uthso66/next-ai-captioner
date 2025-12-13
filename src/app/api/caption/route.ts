@@ -1,41 +1,38 @@
-import { NextResponse } from "next/server";
-import OpenAI from "openai";
+import { NextRequest, NextResponse } from "next/server";
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY!,
-});
-
-export async function POST(req: Request) {
+export async function POST(request: NextRequest) {
   try {
-    const { imageUrl } = await req.json();
+    const formData = await request.formData();
+    const file = formData.get("image") as File;
 
-    // Ensure image URL is provided
-    if (!imageUrl) {
+    if (!file) {
       return NextResponse.json(
-        { error: "No image URL provided." },
+        { error: "No image file provided" },
         { status: 400 }
       );
     }
 
-    const response = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
-      messages: [
-        {
-          role: "user",
-          content: [
-            { type: "text", text: "Describe this image in one sentence." },
-            { type: "image_url", image_url: imageUrl },
-          ],
-        },
-      ],
+    // Create form data to send to Python backend
+    const backendFormData = new FormData();
+    backendFormData.append("file", file);
+
+    // Send request to your Python backend
+    const response = await fetch("http://localhost:8000/caption", {
+      method: "POST",
+      body: backendFormData,
     });
 
-    const caption = response.choices[0]?.message?.content?.trim() || "No caption generated.";
-    return NextResponse.json({ caption });
-  } catch (error) {
-    console.error("Caption API Error:", error);
+    if (!response.ok) {
+      const error = await response.text();
+      throw new Error(`Backend error: ${error}`);
+    }
+
+    const data = await response.json();
+    return NextResponse.json(data);
+  } catch (error: unknown) {
+    console.error("Caption generation error:", error);
     return NextResponse.json(
-      { error: "Failed to generate caption." },
+      { error: error.message || "Failed to generate caption" },
       { status: 500 }
     );
   }
