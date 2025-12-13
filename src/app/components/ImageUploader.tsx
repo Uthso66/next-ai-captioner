@@ -75,6 +75,8 @@ export default function ImageUploader() {
           <div className="mt-4">
             <h3 className="text-sm font-medium text-gray-700 mb-2">Preview:</h3>
             <Image
+              width={700}
+              height={700}
               src={preview}
               alt="Preview"
               className="w-full h-64 object-cover rounded-md"
