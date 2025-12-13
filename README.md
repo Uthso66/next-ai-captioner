@@ -98,16 +98,6 @@ Backend health check:
 
 ---
 
-## 📸 Preview
-
-### Upload & Caption Generation
-
-Users can upload any image and receive an AI-generated description in natural language.
-
-*(Add screenshots here if you want later)*
-
----
-
 ## 🧪 Notes & Limitations
 
 * BLIP runs on **CPU only** (free deployment)
