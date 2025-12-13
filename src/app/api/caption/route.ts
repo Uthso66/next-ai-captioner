@@ -31,9 +31,10 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(data);
   } catch (error: unknown) {
     console.error("Caption generation error:", error);
-    return NextResponse.json(
-      { error: error.message || "Failed to generate caption" },
-      { status: 500 }
-    );
+
+    const message =
+      error instanceof Error ? error.message : "Failed to generate caption";
+
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
